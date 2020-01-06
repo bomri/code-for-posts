@@ -5,7 +5,8 @@ from sampler import ImbalancedDatasetSampler
 
 class ExampleImbalancedDatasetSampler(ImbalancedDatasetSampler):
     """
-    ImbalancedDatasetSampler is taken from https://github.com/ufoym/imbalanced-dataset-sampler/blob/master/sampler.py
+    ImbalancedDatasetSampler is taken from:
+    https://github.com/ufoym/imbalanced-dataset-sampler/blob/master/torchsampler/imbalanced.py
     In order to be able to show the usage of ImbalancedDatasetSampler in this example I am editing the _get_label
     to fit my datasets
     """
