@@ -61,17 +61,13 @@ class BalancedBatchSchedulerSampler(torch.utils.data.sampler.Sampler):
                         cur_sample = cur_sample_org + push_index_val[i]
                         cur_samples.append(cur_sample)
                     except StopIteration:
-                        if i == largest_dataset_index:
-                            # largest dataset iterator is done we can break
-                            samples_to_grab = len(cur_samples)  # adjusting the samples_to_grab
-                            break  # got to the end of iterator - extend final list and continue to next task
-                        else:
-                            # restart the iterator - we want more samples until finishing with the largest dataset
-                            sampler_iterators[i] = samplers_list[i].__iter__()
-                            cur_batch_sampler = sampler_iterators[i]
-                            cur_sample_org = cur_batch_sampler.__next__()
-                            cur_sample = cur_sample_org + push_index_val[i]
-                            cur_samples.append(cur_sample)
+                        # got to the end of iterator - restart the iterator and continue to get samples
+                        # until reaching "epoch_samples"
+                        sampler_iterators[i] = samplers_list[i].__iter__()
+                        cur_batch_sampler = sampler_iterators[i]
+                        cur_sample_org = cur_batch_sampler.__next__()
+                        cur_sample = cur_sample_org + push_index_val[i]
+                        cur_samples.append(cur_sample)
                 final_samples_list.extend(cur_samples)
 
         return iter(final_samples_list)

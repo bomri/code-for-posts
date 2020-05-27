@@ -1,11 +1,12 @@
 import torch
 from torch.utils.data.dataset import ConcatDataset
-from basic_dataset_example import MyFirstDataset, MySecondDataset
+from basic_dataset_example import MyFirstDataset, MySecondDataset, MyThirdDataset
 from multi_task_batch_scheduler import BatchSchedulerSampler
 
 first_dataset = MyFirstDataset()
 second_dataset = MySecondDataset()
-concat_dataset = ConcatDataset([first_dataset, second_dataset])
+third_dataset = MyThirdDataset()
+concat_dataset = ConcatDataset([first_dataset, second_dataset, third_dataset])
 
 batch_size = 8
 
