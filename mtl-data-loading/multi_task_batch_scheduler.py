@@ -1,3 +1,4 @@
+import math
 import torch
 from torch.utils.data.sampler import RandomSampler
 
@@ -10,28 +11,26 @@ class BatchSchedulerSampler(torch.utils.data.sampler.Sampler):
         self.dataset = dataset
         self.batch_size = batch_size
         self.number_of_datasets = len(dataset.datasets)
+        self.largest_dataset_size = max([len(cur_dataset.samples) for cur_dataset in dataset.datasets])
 
     def __len__(self):
-        return len(self.dataset) * self.number_of_datasets
+        return self.batch_size * math.ceil(self.largest_dataset_size / self.batch_size) * len(self.dataset.datasets)
 
     def __iter__(self):
         samplers_list = []
         sampler_iterators = []
-        datasets_length = []
         for dataset_idx in range(self.number_of_datasets):
             cur_dataset = self.dataset.datasets[dataset_idx]
             sampler = RandomSampler(cur_dataset)
             samplers_list.append(sampler)
             cur_sampler_iterator = sampler.__iter__()
             sampler_iterators.append(cur_sampler_iterator)
-            datasets_length.append(len(cur_dataset))
 
         push_index_val = [0] + self.dataset.cumulative_sizes[:-1]
         step = self.batch_size * self.number_of_datasets
         samples_to_grab = self.batch_size
-        largest_dataset_index = torch.argmax(torch.as_tensor(datasets_length)).item()
         # for this case we want to get all samples in dataset, this force us to resample from the smaller datasets
-        epoch_samples = datasets_length[largest_dataset_index] * self.number_of_datasets
+        epoch_samples = self.largest_dataset_size * self.number_of_datasets
 
         final_samples_list = []  # this is a list of indexes from the combined dataset
         for _ in range(0, epoch_samples, step):
